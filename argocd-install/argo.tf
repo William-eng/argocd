@@ -1,6 +1,6 @@
 provider "helm" {
   kubernetes {
-    config_path = "~/.kube/config"
+    config_path = "/etc/rancher/k3s/k3s.yaml"
   }
 }
 terraform {
@@ -22,5 +22,5 @@ resource "helm_release" "argocd" {
   namespace        = "argocd"
   create_namespace = true
   version          = "3.35.4"
-  values           = [file("install.yaml")]
+  values           = [file("install.sh")]
 }

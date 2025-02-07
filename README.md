@@ -17,26 +17,26 @@ This project aims to install a self-managed Argo CD using the App of App pattern
 # Clone Repository
 Clone gokul0815/argocd repository to your local device.
 ```
-git clone https://github.com/gokul0815/argocd.git
+git clone https://github.com/William-eng/argocd.git
 ```
-# Create Local Kubernetes Cluster
-Intall kind.
+# Create Rancher Kubernetes Cluster
+## Install Master
 ```
-brew install kind
-```
-
-Create local Kubernetes Cluster using kind
-```
-kind create cluster — name my-cluster
+curl -sfL https://get.k3s.io | sh -s - --disable traefik --write-kubeconfig-mode 644 --node-name k3s-master-01
 ```
 
-Check cluster is running and healthy
-```
-kubectl cluster-info — context kind-my-cluster
+## Install Worker
+Grab token from the master node to be able to add worked nodes to it:
 
-Kubernetes control plane is running at https://127.0.0.1:50589
-KubeDNS is running at https://127.0.0.1:50589/api/v1/namespaces/kube-system/services/kube-dns:dns/proxy
-To further debug and diagnose cluster problems, use ‘kubectl cluster-info dump’.
+```
+cat /var/lib/rancher/k3s/server/node-token
+```
+Install k3s on the worker node and add it to our cluster:
+
+
+```
+curl -sfL https://get.k3s.io | K3S_NODE_NAME=k3s-worker-01 K3S_URL=https://<IP>:6443 K3S_TOKEN=<TOKEN> sh - 
+
 ```
 
 # Git Repository Hierarchy
@@ -47,96 +47,30 @@ argocd/
 ├── argocd-apps             # stores ArgoCD Application's yaml files
 ├── argocd-install          # stores Argo CD installation files
 │ ├── argo-cd               # argo/argo-cd helm chart
-│ └── values-override.yaml  # custom values.yaml for argo-cd chart
+│ └── argo.tf               # terraform file for argo-cd chart
+│ └── install.sh            # custom values.yaml for argo-cd chart
 ```
 
 # Create App Of Everything Pattern
 
-Open *argocd-install/values-override.yaml* with your favorite editor and modify related values.
+Open *argocd-install/install.sh* with your favorite editor and modify related values.
 ```
-vi argocd-install/values-override.yaml
+vi argocd-install/install.sh
 ```
 Or update it with your values.
 ```
 cat << EOF > argocd-install/values-override.yaml
+---
+global:
+  image:
+    tag: "v2.6.6"
+
+dex:
+  enabled: false
+
 server:
-  configEnabled: true
-  config:
-    repositories: |
-      - type: git
-        url: https://github.com/gokul0815/argocd.git
-      - name: argo-helm
-        type: helm
-        url: https://argoproj.github.io/argo-helm
-  additionalApplications: 
-    - name: argocd
-      namespace: argocd
-      destination:
-        namespace: argocd
-        server: https://kubernetes.default.svc
-      project: argocd
-      source:
-        helm:
-          version: v3
-          valueFiles:
-          - values.yaml
-          - ../values-override.yaml
-        path: argocd-install/argo-cd
-        repoURL: https://github.com/gokul0815/argocd.git
-        targetRevision: HEAD
-      syncPolicy:
-        syncOptions:
-        - CreateNamespace=true
-    - name: argocd-apps
-      namespace: argocd
-      destination:
-        namespace: argocd
-        server: https://kubernetes.default.svc
-      project: argocd
-      source:
-        path: argocd-apps
-        repoURL: https://github.com/gokul0815/argocd.git
-        targetRevision: HEAD
-        directory:
-          recurse: true
-          jsonnet: {}
-      syncPolicy:
-        automated:
-          selfHeal: true
-          prune: true
-    - name: argocd-appprojects
-      namespace: argocd
-      destination:
-        namespace: argocd
-        server: https://kubernetes.default.svc
-      project: argocd
-      source:
-        path: argocd-appprojects
-        repoURL: https://github.com/gokul0815/argocd.git
-        targetRevision: HEAD
-        directory:
-          recurse: true
-          jsonnet: {}
-      syncPolicy:
-        automated:
-          selfHeal: true
-          prune: true
-  additionalProjects: 
-  - name: argocd
-    namespace: argocd
-    additionalLabels: {}
-    additionalAnnotations: {}
-    description: Argocd Project
-    sourceRepos:
-    - '*'
-    destinations:
-    - namespace: argocd
-      server: https://kubernetes.default.svc
-    clusterResourceWhitelist:
-    - group: '*'
-      kind: '*'
-    orphanedResources:
-      warn: false
+  extraArgs:
+    - --insecure
 EOF
 ```
 
@@ -148,10 +82,9 @@ cd argocd/argocd-install/
 
 Intall Argo CD to *argocd* namespace using argo-cd helm chart overriding default values with *values-override.yaml* file. If argocd namespace does not exist, use *--create-namespace* parameter to create it.
 ```
-helm install argocd ./argo-cd \
-    --namespace=argocd \
-    --create-namespace \
-    -f values-override.yaml
+terraform init
+terraform plan
+terraform apply --auto-approve
 ```
 
 Wait until all pods are running.
@@ -177,7 +110,7 @@ Forward argocd-server service port 80 to localhost:8080 using kubectl.
 kubectl -n argocd port-forward service/argocd-server 8080:80
 ```
 
-Browse http://localhost:8080 and login with initial admin password.
+Browse http://<public-ip-address>:8080 and login with initial admin password.
 
 # Demo With Sample Application
 Create an application project definition file called *sample-project*.
@@ -224,7 +157,7 @@ spec:
   project: sample-project
   source:
     path: sample-app/
-    repoURL: https://github.com/gokul0815/argocd.git
+    repoURL: https://github.com/William-eng/argocd.git
     targetRevision: HEAD
   syncPolicy:
     syncOptions:

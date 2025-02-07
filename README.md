@@ -12,7 +12,7 @@
 - [Cleanup](#cleanup)
 
 # Introduction
-This project aims to install a self-managed Argo CD using the App of App pattern. Full instructions and explanation can be found in the Medium article [Self Managed Argo CD — App Of Everything](https://medium.com/devopsturkiye/self-managed-argo-cd-app-of-everything-a226eb100cf0).
+This project aims to install a self-managed Argo CD using the App of App pattern. 
 
 # Clone Repository
 Clone gokul0815/argocd repository to your local device.
@@ -20,6 +20,9 @@ Clone gokul0815/argocd repository to your local device.
 git clone https://github.com/William-eng/argocd.git
 ```
 # Create Rancher Kubernetes Cluster
+For Ec2-instance:
+First install rancher on the master mode, use this [documentation](https://ranchermanager.docs.rancher.com/getting-started/installation-and-upgrade)
+
 ## Install Master
 ```
 curl -sfL https://get.k3s.io | sh -s - --disable traefik --write-kubeconfig-mode 644 --node-name k3s-master-01
@@ -36,6 +39,15 @@ Install k3s on the worker node and add it to our cluster:
 
 ```
 curl -sfL https://get.k3s.io | K3S_NODE_NAME=k3s-worker-01 K3S_URL=https://<IP>:6443 K3S_TOKEN=<TOKEN> sh - 
+
+```
+
+# OPTIONAL - Install nginx ingress controller
+Website: https://kubernetes.github.io/ingress-nginx/
+
+```
+
+kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/controller-v1.2.1/deploy/static/provider/cloud/deploy.yaml
 
 ```
 
@@ -173,7 +185,19 @@ Push changes to your repository.
 git add argocd-apps/sample-app.yaml
 git commit -m "Create application"
 git push
+
 ```
+## Deploying Application via Helm to Argo CD
+Let’s create an application on ArgoCD
+
+```
+argocd app create helm-guestbook --repo https://github.com/William-eng/argocd.git --path helm-argocd1 --dest-server https://kubernetes.default.svc --dest-namespace default
+
+```
+
+You can now see that the health status of our Service is Healthy and Deployment is Progressing. The Deployment will take some time and becomes Healthy.
+
+You can verify the created application on Argo CD by going to the UI.
 
 # Cleanup
 Remove application and applicaiton project.

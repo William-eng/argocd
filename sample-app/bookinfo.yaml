@@ -78,6 +78,13 @@ spec:
         - containerPort: 9080
         securityContext:
           runAsUser: 1000
+        resources:
+          requests:
+            cpu: "250m"  # Request 250 millicores (0.25 CPU)
+            memory: "256Mi"  # Request 256 MB of RAM
+          limits:
+            cpu: "500m"  # Limit to 500 millicores (0.5 CPU)
+            memory: "512Mi"  # Limit to 512 MB of RAM
 ---
 ##################################################################################################
 # Ratings service
@@ -131,6 +138,13 @@ spec:
         - containerPort: 9080
         securityContext:
           runAsUser: 1000
+        resources:
+          requests:
+            cpu: "250m"  # Request 250 millicores (0.25 CPU)
+            memory: "256Mi"  # Request 256 MB of RAM
+          limits:
+            cpu: "500m"  # Limit to 500 millicores (0.5 CPU)
+            memory: "512Mi"  # Limit to 512 MB of RAM
 ---
 ##################################################################################################
 # Reviews service
@@ -192,6 +206,13 @@ spec:
           mountPath: /opt/ibm/wlp/output
         securityContext:
           runAsUser: 1000
+        resources:
+          requests:
+            cpu: "250m"  # Request 250 millicores (0.25 CPU)
+            memory: "256Mi"  # Request 256 MB of RAM
+          limits:
+            cpu: "500m"  # Limit to 500 millicores (0.5 CPU)
+            memory: "512Mi"  # Limit to 512 MB of RAM
       volumes:
       - name: wlp-output
         emptyDir: {}
@@ -234,6 +255,13 @@ spec:
           mountPath: /opt/ibm/wlp/output
         securityContext:
           runAsUser: 1000
+        resources:
+          requests:
+            cpu: "250m"  # Request 250 millicores (0.25 CPU)
+            memory: "256Mi"  # Request 256 MB of RAM
+          limits:
+            cpu: "500m"  # Limit to 500 millicores (0.5 CPU)
+            memory: "512Mi"  # Limit to 512 MB of RAM
       volumes:
       - name: wlp-output
         emptyDir: {}
@@ -276,6 +304,13 @@ spec:
           mountPath: /opt/ibm/wlp/output
         securityContext:
           runAsUser: 1000
+        resources:
+          requests:
+            cpu: "250m"  # Request 250 millicores (0.25 CPU)
+            memory: "256Mi"  # Request 256 MB of RAM
+          limits:
+            cpu: "500m"  # Limit to 500 millicores (0.5 CPU)
+            memory: "512Mi"  # Limit to 512 MB of RAM
       volumes:
       - name: wlp-output
         emptyDir: {}
@@ -337,6 +372,13 @@ spec:
           mountPath: /tmp
         securityContext:
           runAsUser: 1000
+        resources:
+          requests:
+            cpu: "250m"  # Request 250 millicores (0.25 CPU)
+            memory: "256Mi"  # Request 256 MB of RAM
+          limits:
+            cpu: "500m"  # Limit to 500 millicores (0.5 CPU)
+            memory: "512Mi"  # Limit to 512 MB of RAM
       volumes:
       - name: tmp
         emptyDir: {}

@@ -215,6 +215,9 @@ You can verify the created application on Argo CD by going to the UI.
 
 - ![Image8](https://github.com/user-attachments/assets/10f4d584-d6e7-4ff1-9cdd-d585cc3ef079)
 - ![Image9 ](https://github.com/user-attachments/assets/a9e25070-5593-483f-9071-c1076ab16848)
+- ![Image10](https://github.com/user-attachments/assets/eceb06c0-d0c2-4c39-bf4a-04b29f78de28)
+- ![Image11](https://github.com/user-attachments/assets/bf0c9871-0d0f-4bb5-b42c-0e5414657f85)
+
 
 
 
